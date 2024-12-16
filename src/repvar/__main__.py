@@ -57,18 +57,22 @@ def process_file(input_file: Path, output_file: Path, variables: dict) -> bool:
 
     updated_content = re.sub(r"\$\{(.*?)}", lambda m: replace_variable(m, variables), content)
 
-    if content == updated_content:
-        return False
-
     output_file.parent.mkdir(parents=True, exist_ok=True)
     with open(output_file, "w", encoding="utf-8") as f:
         f.write(updated_content)
-    return True
+
+    # Return whether the content was modified
+    return content != updated_content
+
 
 def process_folder(input_folder: Path, output_folder: Path, variables: dict) -> None:
     """Process all files in the input folder and save results in the output folder."""
     for root, _, files in os.walk(input_folder):
         for file_name in files:
+            # Skip the variables.json file
+            if file_name == "variables.json":
+                continue
+
             summary["found"] += 1
             input_file = Path(root) / file_name
 
@@ -80,6 +84,7 @@ def process_folder(input_folder: Path, output_folder: Path, variables: dict) -> 
                 summary["changed"] += 1
             else:
                 summary["unchanged"] += 1
+
 
 @app.command()
 def replace(

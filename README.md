@@ -27,8 +27,8 @@ This project is a Command Line Interface (CLI) application built using Python an
    ```bash
    pip install typer typing-extensions
    ```
-## Method 2: Use UV
- 1. Install UV:
+### Method 2: Use uv
+ 1. Install uv:
     ```bash
     pip install uv
     ```

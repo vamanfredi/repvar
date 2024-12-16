@@ -7,7 +7,9 @@ authors = [
     { name = "vamanfredi@frba.utn.edu.ar", email = "vamanfredi@frba.utn.edu.ar" }
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "typer>=0.15.1",
+]
 
 [project.scripts]
 repvar = "repvar:main"

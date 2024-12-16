@@ -1,23 +1,20 @@
 import os
 import re
+import shutil
 import json
 import typer
+import logging
 from pathlib import Path
 from typing import Optional
-from typing_extensions import Annotated
 
 app = typer.Typer()
 
-# ANSI color codes for terminal output
-BLUE = "\033[94m"
-GREEN = "\033[92m"
-YELLOW = "\033[93m"
-RED = "\033[91m"
-CYAN = "\033[96m"
-MAGENTA = "\033[95m"
-RESET = "\033[0m"
-
-summary = {"found": 0, "changed": 0, "unchanged": 0}
+# Configure logging
+logging.basicConfig(
+    filename="variable_replacement.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
 
 def load_variables(json_path: Path) -> dict:
     """Load variables from a JSON file."""
@@ -25,7 +22,7 @@ def load_variables(json_path: Path) -> dict:
         with open(json_path, "r", encoding="utf-8") as f:
             return json.load(f)
     except Exception as e:
-        print(f"{RED}✗ ERROR: Failed to load variables from {json_path}: {e}{RESET}")
+        logging.error(f"Failed to load variables from {json_path}: {e}")
         raise typer.Exit(f"Error loading variables file: {e}")
 
 def replace_variable(match: re.Match, variables: dict) -> str:
@@ -47,45 +44,51 @@ def replace_variable(match: re.Match, variables: dict) -> str:
             value = value.replace("_", "").lower()
         elif transformation == "remove_":
             value = value.replace("_", "")
+        else:
+            logging.warning(f"Unknown transformation: {transformation}")
 
     return value
 
-def process_file(input_file: Path, output_file: Path, variables: dict) -> bool:
+def process_file(input_file: Path, output_file: Path, variables: dict) -> None:
     """Replace variables in a single file and save the result to the output path."""
-    with open(input_file, "r", encoding="utf-8") as f:
-        content = f.read()
+    try:
+        with open(input_file, "r", encoding="utf-8") as f:
+            content = f.read()
 
-    updated_content = re.sub(r"\$\{(.*?)}", lambda m: replace_variable(m, variables), content)
+        # Replace variables in file content
+        updated_content = re.sub(r"\$\{(.*?)}", lambda m: replace_variable(m, variables), content)
 
-    if content == updated_content:
-        return False
+        # Write updated content to the output file
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+        with open(output_file, "w", encoding="utf-8") as f:
+            f.write(updated_content)
 
-    output_file.parent.mkdir(parents=True, exist_ok=True)
-    with open(output_file, "w", encoding="utf-8") as f:
-        f.write(updated_content)
-    return True
+        logging.info(f"Processed file: {input_file} -> {output_file}")
+    except Exception as e:
+        logging.error(f"Failed to process file {input_file}: {e}")
+        raise typer.Exit(f"Error processing file {input_file}: {e}")
 
 def process_folder(input_folder: Path, output_folder: Path, variables: dict) -> None:
     """Process all files in the input folder and save results in the output folder."""
     for root, _, files in os.walk(input_folder):
         for file_name in files:
-            summary["found"] += 1
             input_file = Path(root) / file_name
 
+            # Replace variables in filenames
             updated_file_name = re.sub(r"\$\{(.*?)}", lambda m: replace_variable(m, variables), file_name)
             relative_path = Path(root).relative_to(input_folder)
             output_file = output_folder / relative_path / updated_file_name
 
-            if process_file(input_file, output_file, variables):
-                summary["changed"] += 1
-            else:
-                summary["unchanged"] += 1
+            # Process file content
+            process_file(input_file, output_file, variables)
 
 @app.command()
 def replace(
     input_folder: Path = typer.Argument(..., help="Path to the input folder."),
     output_folder: Path = typer.Argument(..., help="Path to the output folder."),
-    variables_json: Annotated[Optional[Path], typer.Argument(..., help="Path to the JSON file with variables. Defaults to variables.json in the input folder.")] = None
+    variables_json: Optional[Path] = typer.Option(
+        None, help="Path to the JSON file with variables. Defaults to variables.json in the input folder."
+    ),
 ):
     """
     Replace variables in all files and filenames in the input folder.
@@ -94,25 +97,19 @@ def replace(
 
     If no variables JSON file is provided, the script looks for variables.json in the input folder.
     """
+    # Determine variables JSON file path
     if variables_json is None:
         variables_json = input_folder / "variables.json"
 
     if not variables_json.exists():
-        print(f"{RED}✗ ERROR: Variables JSON file not found: {variables_json}{RESET}")
+        logging.error(f"Variables JSON file not found: {variables_json}")
         raise typer.Exit("Variables JSON file not found.")
 
+    # Load variables
     variables = load_variables(variables_json)
-    print(f"{MAGENTA}Input Folder: {input_folder}{RESET}")
-    print(f"{MAGENTA}Output Folder: {output_folder}{RESET}")
-    print(f"{MAGENTA}Variables Loaded: {list(variables.keys())}{RESET}")
 
+    # Process folder
     process_folder(input_folder, output_folder, variables)
-
-    # Print summary with colors
-    print(f"{BLUE}Files Found: {summary['found']}{RESET}")
-    print(f"{GREEN}✓ Files Changed: {summary['changed']}{RESET}")
-    print(f"{YELLOW}~ Files Unchanged: {summary['unchanged']}{RESET}")
 
 def main():
     app()
-

@@ -1,14 +1,20 @@
 [project]
-name = "repvar"
+name = "repvar_vamanfredi"
 version = "0.1.0"
-description = "Add your description here"
+description = "Easily replace variables through files and filenames!"
 readme = "README.md"
 authors = [
-    { name = "vamanfredi@frba.utn.edu.ar", email = "vamanfredi@frba.utn.edu.ar" }
+    { name = "Valentin Manfredi", email = "vamanfredi@frba.utn.edu.ar" }
 ]
 requires-python = ">=3.12"
 dependencies = [
     "typer>=0.15.1",
+]
+classifiers =[
+    "Environment :: Console",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Utilities",
+    "Topic :: Text Processing"
 ]
 
 [project.scripts]
@@ -17,3 +23,6 @@ repvar = "repvar:main"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[project.urls]
+Homepage = "https://github.com/vamanfredi/repvar"

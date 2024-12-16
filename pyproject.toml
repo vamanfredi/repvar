@@ -1,6 +1,6 @@
 [project]
 name = "repvar_vamanfredi"
-version = "0.1.0"
+version = "0.1.1"
 description = "Easily replace variables through files and filenames!"
 readme = "README.md"
 authors = [

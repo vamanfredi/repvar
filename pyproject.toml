@@ -18,7 +18,7 @@ classifiers =[
 ]
 
 [project.scripts]
-repvar = "repvar:main"
+repvar = "repvar.__main__:main"
 
 [build-system]
 requires = ["hatchling"]

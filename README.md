@@ -50,7 +50,7 @@ uv tool install --from git+https://github.com/vamanfredi/repvar repvar
 Run the CLI application with the following command:
 
 ```bash
-python -m repvar replace <input_folder> <output_folder> [variables_json]
+repvar <input_folder> <output_folder> [variables_json]
 ```
 
 ### Arguments
@@ -62,7 +62,7 @@ python -m repvar replace <input_folder> <output_folder> [variables_json]
 ### Example
 
 ```bash
-python -m repvar ./input ./output ./variables.json
+repvar ./input ./output ./variables.json
 ```
 
 ### Example `variables.json`

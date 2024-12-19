@@ -1,6 +1,6 @@
 # JSON Variable Replacer CLI (repvar)
 
-This project is a Command Line Interface (CLI) application built using Python and the `typer` library. It allows you to replace variables in files and filenames within an input folder and save the processed files to an output folder.
+This project is a Command Line Interface (CLI) application built using Python and the typer library. It allows you to replace variables in files and filenames within an input folder and save the processed files to an output folder.
 
 ## Features
 
@@ -18,43 +18,54 @@ This project is a Command Line Interface (CLI) application built using Python an
 
 ## Installation
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/vamanfredi/repvar.git
-   cd repvar
-   ```
-2. Install dependencies:
-   ```bash
-   pip install typer typing-extensions
-   ```
-### Method 2: Use uv
- 1. Install uv:
-    ```bash
-    pip install uv
-    ```
- 2. Run uv tool install:
-    ```bash
-     uv tool install --from git+https://github.com/vamanfredi/repvar repvar
-     ```
+### Method 1: Install from PyPI
+
+The package is available on PyPI and can be installed directly:
+
+```bash
+pip install repvar
+```
+
+### Method 2: Install from Source
+
+Clone the repository and install the dependencies:
+
+```bash
+git clone https://github.com/vamanfredi/repvar.git
+cd repvar
+pip install typer typing-extensions
+```
+
+### Method 3: Use uv
+
+Install `uv` and run the tool installation:
+
+```bash
+pip install uv
+uv tool install --from git+https://github.com/vamanfredi/repvar repvar
+```
 
 ## Usage
 
 Run the CLI application with the following command:
+
 ```bash
-python main.py replace <input_folder> <output_folder> [variables_json]
+python -m repvar replace <input_folder> <output_folder> [variables_json]
 ```
 
 ### Arguments
+
 - `<input_folder>`: Path to the folder containing the files to process.
 - `<output_folder>`: Path to the folder where processed files will be saved.
 - `[variables_json]`: Optional. Path to the JSON file with variables. Defaults to `variables.json` in the input folder.
 
 ### Example
+
 ```bash
-python main.py replace ./input ./output ./variables.json
+python -m repvar ./input ./output ./variables.json
 ```
 
-## Example `variables.json`
+### Example `variables.json`
 
 ```json
 {
@@ -64,17 +75,22 @@ python main.py replace ./input ./output ./variables.json
 }
 ```
 
-### Result
-- Before replacement:
-  - Filename: `welcome_${username}.txt`
-  - Content: `Welcome to ${project}, ${greeting}!`
-- After replacement:
-  - Filename: `welcome_JohnDoe.txt`
-  - Content: `Welcome to MyProject, Hello!`
+#### Result
+
+**Before replacement:**
+
+- Filename: `welcome_${username}.txt`
+- Content: `Welcome to ${project}, ${greeting}!`
+
+**After replacement:**
+
+- Filename: `welcome_JohnDoe.txt`
+- Content: `Welcome to MyProject, Hello!`
 
 ## Output Example
 
 Upon execution, the CLI will display a summary:
+
 ```plaintext
 Input Folder: ./input
 Output Folder: ./output
@@ -86,5 +102,5 @@ Files Found: 10
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the `LICENSE` file for details.
 
